@@ -1,0 +1,893 @@
+<!doctype html>
+<html lang="da">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Plus Pack – Rep-seddel (Edge/Win10)</title>
+  <style>
+    *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+    html,body{height:100%}
+    body{margin:0;font-family:Segoe UI,Arial,Helvetica,sans-serif;background:#f5f7fb;color:#0f172a}
+    :focus{outline:2px solid #94c5ff;outline-offset:1px}
+
+    .topbar{background:#0a61ae;color:#fff;padding:8px 12px}
+    .toprow{display:-ms-flexbox;display:flex;-ms-align-items:center;align-items:center}
+    .brand{font-weight:800;letter-spacing:.2px}
+    .statuspill{
+      display:inline-block;
+      border:1px solid rgba(255,255,255,.35);
+      border-radius:999px;
+      padding:4px 10px;
+      background:rgba(255,255,255,.08);
+      font-weight:700;
+      margin-left:10px;
+    }
+    .statuspill-inner{
+      display:-ms-flexbox;display:flex;
+      -ms-align-items:center;align-items:center;
+    }
+    .dot{width:10px;height:10px;border-radius:999px;background:#17833e;display:inline-block;margin-right:6px}
+    .dot.pending{background:#f59e0b}
+    .dot.error{background:#dc2626}
+    .tl{
+      display:-ms-flexbox;display:flex;
+      -ms-align-items:center;align-items:center;
+      margin-left:auto;
+      font-size:11px;
+      opacity:.9;
+    }
+
+    .container{max-width:920px;margin:0 auto;padding:12px}
+    .card{background:#fff;border:1px solid #e6ecf3;border-radius:12px;padding:12px;box-shadow:0 6px 20px rgba(15,23,42,.06);margin-bottom:10px}
+    h3{margin:0 0 8px}
+    label{font-size:11px;color:#6b7280;display:block;margin-bottom:3px}
+    input,select,textarea{width:100%;border:1px solid #dfe7f2;border-radius:10px;padding:8px 10px;background:#fff;font-size:14px;line-height:1.2}
+    textarea{min-height:80px}
+    .row{
+      display:-ms-flexbox;display:flex;
+      -ms-flex-wrap:wrap;flex-wrap:wrap;
+      margin-left:-4px;
+      margin-right:-4px;
+    }
+    .field{
+      margin-bottom:8px;
+      -ms-flex:1 1 200px;flex:1 1 200px;
+      padding-left:4px;
+      padding-right:4px;
+    }
+    .field.full{-ms-flex:1 1 100%;flex:1 1 100%}
+    .hint{font-size:12px;color:#6b7280}
+    .hint-status{margin-top:4px}
+    .btn{border:1px solid #dbe4ef;background:#fff;border-radius:10px;padding:8px 12px;font-weight:700;cursor:pointer;font-size:14px}
+    .btn:disabled{opacity:.5;cursor:not-allowed}
+    .btn-primary{background:#e8f1ff;border-color:#cfe2ff;color:#0a3d91}
+    .btn-danger{background:#fff1f1;border-color:#f3b3b3;color:#7f1d1d}
+    .btn.xs{padding:4px 8px;font-size:12px;border-radius:8px;margin-left:4px}
+
+    /* fejlmarkering */
+    .input-error{border-color:#dc2626;background:#fef2f2}
+    .err-msg{font-size:11px;color:#b91c1c;margin-top:2px;min-height:14px}
+
+    .loglist{list-style:none;margin:0;padding:0;border:1px dashed #dbe4ef;border-radius:10px;background:#fff;max-height:420px;overflow:auto}
+    .logitem{padding:8px;border-bottom:1px solid #eef2f7;-ms-transition:background .15s ease,opacity .15s ease;transition:background .15s ease,opacity .15s ease}
+    .logitem:last-child{border-bottom:0}
+    .logitem.closed{background:#f9fafb;opacity:.85}
+    .log-header{
+      display:-ms-flexbox;display:flex;
+      -ms-flex-wrap:wrap;flex-wrap:wrap;
+      -ms-align-items:flex-start;align-items:flex-start;
+      margin-left:-4px;
+      margin-right:-4px;
+    }
+    .log-ts{min-width:130px;color:#6b7280;font-size:12px;padding-left:4px;padding-right:4px}
+    .badge{display:inline-block;border-radius:999px;padding:2px 8px;font-size:12px;border:1px solid #e2e8f0;background:#f8fafc;margin-right:6px}
+    .badge.rep{background:#ede9fe;border-color:#ddd6fe;color:#4c1d95}
+    .badge-status-open{background:#dcfce7;border-color:#bbf7d0;color:#166534}
+    .badge-status-closed{background:#e5e7eb;border-color:#cbd5f5;color:#4b5563}
+    .log-meta{
+      margin-left:auto;
+      text-align:right;
+      color:#6b7280;
+      font-size:12px;
+      min-width:150px;
+      padding-left:4px;
+      padding-right:4px;
+    }
+    .log-body{margin-top:4px;font-size:13px}
+    .log-title{font-weight:600}
+    .log-where{font-style:italic;color:#4b5563}
+    .actions{
+      margin-top:6px;
+      display:-ms-flexbox;display:flex;
+      -ms-flex-wrap:wrap;flex-wrap:wrap;
+      -ms-justify-content:flex-end;justify-content:flex-end;
+    }
+    .actions .btn{margin-left:4px;margin-top:4px}
+
+    .editbox{margin-top:8px;padding:8px;border:1px dashed #cfe2ff;border-radius:10px;background:#f8fbff}
+    .resetconfirm{display:none;margin-top:8px;padding:8px;border:1px solid #fecaca;background:#fff1f2;border-radius:10px}
+
+    @media (max-width:800px){
+      .log-meta{text-align:left;margin-left:0;margin-top:4px}
+      .toprow{-ms-flex-wrap:wrap;flex-wrap:wrap}
+      .statuspill{margin-top:6px}
+    }
+  </style>
+</head>
+<body>
+  <div class="topbar">
+    <div class="toprow">
+      <div class="brand">Plus Pack – Rep-seddel</div>
+      <span class="statuspill">
+        <span class="statuspill-inner">
+          <span id="dot" class="dot"></span>
+          <span id="statxt">Online</span>
+        </span>
+      </span>
+      <div class="tl">
+        <button id="btn-test" class="btn xs">Test-forbindelse</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="container">
+    <!-- Formular -->
+    <div class="card">
+      <h3>Opret rep-seddel</h3>
+      <div class="row">
+        <div class="field">
+          <label>Navn *</label>
+          <input id="rep-name" type="text" placeholder="Navn/initialer">
+          <div id="err-name" class="err-msg"></div>
+        </div>
+        <div class="field">
+          <label>Afdeling *</label>
+          <select id="rep-dept">
+            <option value="">— Vælg afdeling —</option>
+            <option value="Plast">Plast</option>
+            <option value="Alu">Alu</option>
+            <option value="Lager">Lager</option>
+            <option value="Produktion">Produktion</option>
+            <option value="Værksted">Værksted</option>
+          </select>
+          <div id="err-dept" class="err-msg"></div>
+        </div>
+      </div>
+      <div class="row">
+        <div class="field">
+          <label>Prioritet</label>
+          <select id="rep-pri">
+            <option>Lav</option>
+            <option>Mellem</option>
+            <option>Høj</option>
+            <option>Kritisk</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Fejltype</label>
+          <input id="rep-type" type="text" placeholder="fx Mekanisk, Elektrisk">
+        </div>
+        <div class="field">
+          <label>Hvor *</label>
+          <input id="rep-where" type="text" placeholder="Hvor er problemet?">
+          <div id="err-where" class="err-msg"></div>
+        </div>
+      </div>
+      <div class="field full">
+        <label>Beskrivelse *</label>
+        <textarea id="rep-desc" placeholder="Kort og præcis beskrivelse"></textarea>
+        <div id="err-desc" class="err-msg"></div>
+      </div>
+      <div class="row" style="-ms-justify-content:flex-end;justify-content:flex-end;margin-top:4px">
+        <div class="field" style="-ms-flex:0 0 auto;flex:0 0 auto;text-align:right">
+          <button id="rep-clear" class="btn">Ryd formular</button>
+          <button id="rep-create" class="btn btn-primary">Opret rep-seddel</button>
+        </div>
+      </div>
+      <div class="hint hint-status" id="sendHint">
+        Rep-sedler sendes til SharePoint via Power Automate ca. 3 minutter efter oprettelse.
+        Du kan redigere i denne periode – den seneste version bliver sendt.
+      </div>
+    </div>
+
+    <!-- Registreringer -->
+    <div class="card">
+      <h3>Registrerede rep-sedler</h3>
+      <ul id="repList" class="loglist"></ul>
+      <div class="row" style="-ms-justify-content:flex-end;justify-content:flex-end;margin-top:8px">
+        <div class="field" style="-ms-flex:0 0 auto;flex:0 0 auto;text-align:right">
+          <button id="btn-clear-list" class="btn btn-danger">Ryd liste</button>
+        </div>
+      </div>
+      <div id="list-confirm" class="resetconfirm">
+        <b>Er du sikker?</b> Dette sletter kun lokalt gemte rep-sedler (ikke SharePoint).
+        <div class="row" style="-ms-justify-content:flex-end;justify-content:flex-end;margin-top:6px">
+          <div class="field" style="-ms-flex:0 0 auto;flex:0 0 auto;text-align:right">
+            <button id="btn-list-cancel" class="btn">Fortryd</button>
+            <button id="btn-list-do" class="btn btn-danger">Ja, slet lokalt</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+  // ===== Hjælpere =====
+  function $(id){return document.getElementById(id);}
+  function fmtDate(d){
+    var dt=(d instanceof Date)?d:new Date(d);
+    try{
+      if(dt.toLocaleString){
+        return dt.toLocaleString('da-DK');
+      }
+      return dt.toString();
+    }catch(e){
+      return dt.toString();
+    }
+  }
+  function escapeHtml(s){
+    if(s===null||s===undefined)return '';
+    return String(s)
+      .replace(/&/g,'&amp;')
+      .replace(/</g,'&lt;')
+      .replace(/>/g,'&gt;')
+      .replace(/\"/g,'&quot;');
+  }
+  function loadJSON(k,def){
+    try{
+      if(!window.localStorage){return def;}
+      var v=localStorage.getItem(k);
+      return v?JSON.parse(v):def;
+    }catch(e){
+      return def;
+    }
+  }
+  function saveJSON(k,v){
+    try{
+      if(!window.localStorage){return;}
+      localStorage.setItem(k,JSON.stringify(v));
+    }catch(e){}
+  }
+  function removeStorage(k){
+    try{
+      if(!window.localStorage){return;}
+      localStorage.removeItem(k);
+    }catch(e){}
+  }
+  function uuid(){return 'id-'+Date.now()+'-'+Math.floor(Math.random()*1000000);}
+
+  // ===== Keys =====
+  var PFX          ='pprep.';
+  var KEY_SETTINGS =PFX+'settings.v1';   // navn + afdeling
+  var KEY_REPS     =PFX+'reps.v2';       // v2 pga. status-felt
+  var KEY_FEED     =PFX+'feed.v1';
+  var KEY_DRAFT    =PFX+'draft.v1';
+
+  function settings(){return loadJSON(KEY_SETTINGS,{});}
+  function saveSettings(x){saveJSON(KEY_SETTINGS,x);}
+  function reps(){return loadJSON(KEY_REPS,[]);}
+  function saveReps(x){saveJSON(KEY_REPS,x);}
+
+  // Basis til flowet
+  function basisBlock(){
+    var s=settings();
+    return {
+      name:      s.name      || '',
+      department:s.department|| ''
+    };
+  }
+
+  // ===== Statuslampe =====
+  function unsentCount(){
+    var f=loadJSON(KEY_FEED,[]),i,n=0;
+    for(i=0;i<f.length;i++){
+      if(f[i] && f[i].sent===false){n++;}
+    }
+    return n;
+  }
+  function updateStatusLamp(){
+    var dot=$('dot'),txt=$('statxt');
+    if(!dot || !txt){return;}
+    var n=unsentCount();
+    if(n===0){
+      dot.className='dot';
+      txt.innerHTML='Online';
+    }else{
+      dot.className='dot pending';
+      txt.innerHTML='Afventer afsendelse ('+n+')';
+    }
+  }
+
+  // ===== Endpoint + delay =====
+  // Din Power Automate HTTP-trigger URL:
+  var ENDPOINT_UNIFIED='https://default430cd76f558540b4b6d4f372acf579.16.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/9fe68ebbe8664bc3aa3d9456e7a10de2/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=c7HaAXxpuyYCPkGEIg8sH1q_rUdpOstcEq-Z5t0eD1Y';
+  var API_KEY=null;
+  var DELAY_REP_MS=3*60*1000; // 3 minutter
+
+  function postJSON(url,payload,cb){
+    if(!url || url.indexOf('http')!==0){
+      if(cb){cb(false,0,'bad url');}
+      return;
+    }
+    try{
+      var xhr=new XMLHttpRequest();
+      xhr.open('POST',url,true);
+      xhr.setRequestHeader('Content-Type','application/json;charset=UTF-8');
+      if(API_KEY){xhr.setRequestHeader('x-api-key',API_KEY);}
+      xhr.timeout=15000;
+      xhr.ontimeout=function(){
+        if(cb){cb(false,0,'timeout');}
+        updateStatusLamp();
+      };
+      xhr.onerror=function(){
+        if(cb){cb(false,0,'network');}
+        updateStatusLamp();
+      };
+      xhr.onreadystatechange=function(){
+        if(xhr.readyState===4){
+          var ok=(xhr.status>=200 && xhr.status<300);
+          if(cb){cb(ok,xhr.status,xhr.responseText);}
+          updateStatusLamp();
+        }
+      };
+      xhr.send(JSON.stringify(payload));
+    }catch(e){
+      if(cb){cb(false,0,String(e));}
+    }
+  }
+
+  function queueUpdate(kind,payload,delayMs){
+    var feed=loadJSON(KEY_FEED,[]);
+    var nb=null;
+    if(delayMs && delayMs>0){
+      nb=new Date(Date.now()+delayMs).toISOString();
+    }
+    feed.push({kind:kind,sent:false,payload:payload,notBefore:nb});
+    saveJSON(KEY_FEED,feed);
+    flushFeedNow();
+  }
+
+  function syncQueuedRepPayload(repId,repObj){
+    var feed=loadJSON(KEY_FEED,[]);
+    var i;
+    for(i=0;i<feed.length;i++){
+      var r=feed[i];
+      if(!r || r.sent){continue;}
+      if(r.kind==='rep' && r.payload && r.payload.id===repId){
+        r.payload.name       =repObj.name;
+        r.payload.department =repObj.department;
+        r.payload.priority   =repObj.priority;
+        r.payload.type       =repObj.type;
+        r.payload.where      =repObj.where;
+        r.payload.description=repObj.description;
+        r.payload.status     =repObj.status;
+      }
+    }
+    saveJSON(KEY_FEED,feed);
+  }
+
+  function flushFeedNow(){
+    var feed=loadJSON(KEY_FEED,[]),i;
+    var nowMs=new Date().getTime();
+    for(i=0;i<feed.length;i++){
+      var r=feed[i];
+      if(!r || r.sent){continue;}
+      if(r.notBefore){
+        var nbMs=new Date(r.notBefore).getTime();
+        if(nbMs>nowMs){continue;}
+      }
+      var env={
+        kind:      r.kind,
+        client_ts:new Date().toISOString(),
+        basis:     basisBlock(),
+        data:      r.payload
+      };
+      (function(idx){
+        postJSON(ENDPOINT_UNIFIED,env,function(ok){
+          if(ok){
+            var f2=loadJSON(KEY_FEED,[]);
+            if(f2[idx]){
+              f2[idx].sent=true;
+              saveJSON(KEY_FEED,f2);
+            }
+          }
+        });
+      })(i);
+    }
+    updateStatusLamp();
+  }
+  function resendQueued(){flushFeedNow();}
+
+  // ===== Autosave af formular =====
+  function saveDraft(){
+    var d={
+      name:  $('rep-name')  ? $('rep-name').value  : '',
+      dept:  $('rep-dept')  ? $('rep-dept').value  : '',
+      pri:   $('rep-pri')   ? $('rep-pri').value   : '',
+      type:  $('rep-type')  ? $('rep-type').value  : '',
+      where: $('rep-where') ? $('rep-where').value : '',
+      desc:  $('rep-desc')  ? $('rep-desc').value  : ''
+    };
+    saveJSON(KEY_DRAFT,d);
+  }
+  function clearDraft(){removeStorage(KEY_DRAFT);}
+  function restoreDraft(){
+    var d=loadJSON(KEY_DRAFT,null);
+    var s=settings();
+    if(!d){d={};}
+    if($('rep-name'))  {$('rep-name').value  = d.name  || s.name        || '';}
+    if($('rep-dept'))  {$('rep-dept').value  = d.dept  || s.department  || '';}
+    if($('rep-pri'))   {$('rep-pri').value   = d.pri   || 'Mellem';}
+    if($('rep-type'))  {$('rep-type').value  = d.type  || '';}
+    if($('rep-where')) {$('rep-where').value = d.where || '';}
+    if($('rep-desc'))  {$('rep-desc').value  = d.desc  || '';}
+  }
+
+  // ===== Validation helpers =====
+  function clearErrors(){
+    var ids=['rep-name','rep-dept','rep-where','rep-desc'];
+    var msgIds=['err-name','err-dept','err-where','err-desc'];
+    var i;
+    for(i=0;i<ids.length;i++){
+      var f=$(ids[i]);
+      if(f){
+        f.className=f.className.replace(/\binput-error\b/g,'');
+      }
+    }
+    for(i=0;i<msgIds.length;i++){
+      var m=$(msgIds[i]);
+      if(m){m.innerHTML='';}
+    }
+    var hint=$('sendHint');
+    if(hint){
+      hint.innerHTML='Rep-sedler sendes til SharePoint via Power Automate ca. 3 minutter efter oprettelse. Du kan redigere i denne periode – den seneste version bliver sendt.';
+      hint.style.color='#6b7280';
+    }
+  }
+  function setError(fieldId,msgId,message){
+    var f=$(fieldId),m=$(msgId);
+    if(f){
+      if(f.className.indexOf('input-error')===-1){
+        f.className+=' input-error';
+      }
+    }
+    if(m){m.innerHTML=message;}
+  }
+
+  // ===== Vis liste =====
+  function renderRepList(){
+    var list=$('repList');
+    if(!list){return;}
+    list.innerHTML='';
+    var arr=reps().slice();
+
+    // sortér: Åben først, derefter Afsluttet, inden for hver gruppe nyeste øverst
+    arr.sort(function(a,b){
+      var sa=a.status||'Åben';
+      var sb=b.status||'Åben';
+      if(sa===sb){
+        return new Date(b.ts)-new Date(a.ts);
+      }
+      return sa==='Åben' ? -1 : 1;
+    });
+
+    if(arr.length===0){
+      var liEmpty=document.createElement('li');
+      liEmpty.className='logitem';
+      liEmpty.innerHTML='<span class="hint">Ingen rep-sedler oprettet endnu.</span>';
+      list.appendChild(liEmpty);
+      return;
+    }
+
+    for(var i=0;i<arr.length;i++){
+      var r=arr[i];
+      if(!r.status){r.status='Åben';}
+
+      var li=document.createElement('li');
+      li.className='logitem';
+      if(r.status==='Afsluttet'){li.className+=' closed';}
+
+      var top=document.createElement('div');
+      top.className='log-header';
+
+      var left=document.createElement('div');
+      left.className='log-ts';
+      left.innerHTML=fmtDate(r.ts);
+
+      var mid=document.createElement('div');
+      var statusClass = (r.status==='Åben') ? 'badge-status-open' : 'badge-status-closed';
+      var statusBadge = '<span class="badge '+statusClass+'">'+escapeHtml(r.status)+'</span>';
+      mid.innerHTML='<span class="badge rep">Rep</span> '+statusBadge;
+
+      var right=document.createElement('div');
+      right.className='log-meta';
+      right.innerHTML=[
+        'Navn: '+(r.name||'-'),
+        'Afdeling: '+(r.department||'-')
+      ].join(' · ');
+
+      top.appendChild(left);
+      top.appendChild(mid);
+      top.appendChild(right);
+      li.appendChild(top);
+
+      var body=document.createElement('div');
+      body.className='log-body';
+      var title='<span class="log-title">'+escapeHtml(r.type||'')+'</span>';
+      var pri=' · Prioritet: '+escapeHtml(r.priority||'');
+      var whereTxt=r.where?'<div class="log-where">Hvor: '+escapeHtml(r.where)+'</div>':'';
+      var desc=r.description?'<div>'+escapeHtml(r.description)+'</div>':'';
+      body.innerHTML=title+pri+whereTxt+desc;
+      li.appendChild(body);
+
+      var act=document.createElement('div');
+      act.className='actions';
+
+      var btn=document.createElement('button');
+      btn.className='btn xs';
+      btn.innerHTML='Redigér';
+      btn.onclick=(function(id){
+        return function(){toggleEditor(id);};
+      })(r.id);
+      act.appendChild(btn);
+
+      var statusBtn=document.createElement('button');
+      statusBtn.className='btn xs';
+      if(r.status==='Åben'){
+        statusBtn.innerHTML='Afslut';
+        statusBtn.onclick=(function(id){
+          return function(){closeRep(id);};
+        })(r.id);
+      }else{
+        statusBtn.innerHTML='Genåbn';
+        statusBtn.onclick=(function(id){
+          return function(){reopenRep(id);};
+        })(r.id);
+      }
+      act.appendChild(statusBtn);
+
+      li.appendChild(act);
+
+      var edit=document.createElement('div');
+      edit.className='editbox';
+      edit.id='edit-'+r.id;
+      edit.style.display='none';
+      edit.innerHTML=editorRepHTML(r);
+      li.appendChild(edit);
+
+      list.appendChild(li);
+    }
+  }
+
+  function editorRepHTML(r){
+    var pri=['Lav','Mellem','Høj','Kritisk'],opts='',i;
+    for(i=0;i<pri.length;i++){
+      var sel=(r.priority===pri[i])?' selected':'';
+      opts+='<option'+sel+'>'+pri[i]+'</option>';
+    }
+    function deptOpt(val,label){
+      var sel=(r.department===val)?' selected':'';
+      return '<option value="'+val+'"'+sel+'>'+label+'</option>';
+    }
+    return ''+
+      '<div class="row">'+
+        '<div class="field"><label>Navn</label><input id="edit-name" type="text" value="'+escapeHtml(r.name||'')+'"></div>'+
+        '<div class="field"><label>Afdeling</label>'+
+          '<select id="edit-dept">'+
+            '<option value="">— Vælg afdeling —</option>'+
+            deptOpt('Plast','Plast')+
+            deptOpt('Alu','Alu')+
+            deptOpt('Lager','Lager')+
+            deptOpt('Produktion','Produktion')+
+            deptOpt('Værksted','Værksted')+
+          '</select>'+
+        '</div>'+
+      '</div>'+
+      '<div class="row">'+
+        '<div class="field"><label>Prioritet</label><select id="edit-pri">'+opts+'</select></div>'+
+        '<div class="field"><label>Fejltype</label><input id="edit-type" type="text" value="'+escapeHtml(r.type||'')+'"></div>'+
+        '<div class="field"><label>Hvor</label><input id="edit-where" type="text" value="'+escapeHtml(r.where||'')+'"></div>'+
+      '</div>'+
+      '<div class="field full"><label>Beskrivelse</label><textarea id="edit-desc">'+escapeHtml(r.description||'')+'</textarea></div>'+
+      '<div class="row" style="-ms-justify-content:flex-end;justify-content:flex-end;margin-top:4px">'+
+        '<div class="field" style="-ms-flex:0 0 auto;flex:0 0 auto;text-align:right">'+
+          '<button class="btn" id="edit-cancel">Annuller</button>'+
+          '<button class="btn btn-primary" id="edit-save">Gem</button>'+
+        '</div>'+
+      '</div>';
+  }
+
+  function toggleEditor(id){
+    var el=$('edit-'+id);
+    if(!el){return;}
+    var isOpen=(el.style.display!=='none');
+    el.style.display=isOpen?'none':'block';
+    if(!isOpen){
+      var btnCancel=el.querySelector('#edit-cancel');
+      var btnSave=el.querySelector('#edit-save');
+      if(btnCancel){
+        btnCancel.onclick=function(){el.style.display='none';};
+      }
+      if(btnSave){
+        btnSave.onclick=function(){saveRepEdit(id);};
+      }
+    }
+  }
+
+  function saveRepEdit(id){
+    var arr=reps(),i,r=null;
+    for(i=0;i<arr.length;i++){
+      if(arr[i].id===id){r=arr[i];break;}
+    }
+    if(!r){return;}
+    var box=$('edit-'+id);
+    if(!box){return;}
+
+    var nameEl=box.querySelector('#edit-name');
+    var deptEl=box.querySelector('#edit-dept');
+    var priEl =box.querySelector('#edit-pri');
+    var typEl =box.querySelector('#edit-type');
+    var wheEl =box.querySelector('#edit-where');
+    var desEl =box.querySelector('#edit-desc');
+
+    r.name       =nameEl?nameEl.value:r.name;
+    r.department =deptEl?deptEl.value:r.department;
+    r.priority   =priEl?priEl.value:r.priority;
+    r.type       =typEl?typEl.value:r.type;
+    r.where      =wheEl?wheEl.value:r.where;
+    r.description=desEl?desEl.value:r.description;
+
+    saveReps(arr);
+    syncQueuedRepPayload(id,r);
+
+    queueUpdate('rep_update',{
+      id:          r.id,
+      ts:          r.ts,
+      name:        r.name,
+      department:  r.department,
+      priority:    r.priority,
+      type:        r.type,
+      where:       r.where,
+      description: r.description,
+      status:      r.status
+    });
+
+    renderRepList();
+  }
+
+  function closeRep(id){
+    var arr=reps(),i,r=null;
+    for(i=0;i<arr.length;i++){
+      if(arr[i].id===id){r=arr[i];break;}
+    }
+    if(!r){return;}
+    r.status='Afsluttet';
+    saveReps(arr);
+    syncQueuedRepPayload(id,r);
+    queueUpdate('rep_update',{
+      id:          r.id,
+      ts:          r.ts,
+      name:        r.name,
+      department:  r.department,
+      priority:    r.priority,
+      type:        r.type,
+      where:       r.where,
+      description: r.description,
+      status:      r.status
+    });
+    renderRepList();
+  }
+
+  function reopenRep(id){
+    var arr=reps(),i,r=null;
+    for(i=0;i<arr.length;i++){
+      if(arr[i].id===id){r=arr[i];break;}
+    }
+    if(!r){return;}
+    r.status='Åben';
+    saveReps(arr);
+    syncQueuedRepPayload(id,r);
+    queueUpdate('rep_update',{
+      id:          r.id,
+      ts:          r.ts,
+      name:        r.name,
+      department:  r.department,
+      priority:    r.priority,
+      type:        r.type,
+      where:       r.where,
+      description: r.description,
+      status:      r.status
+    });
+    renderRepList();
+  }
+
+  function createRep(){
+    clearErrors();
+
+    var name =($('rep-name') && $('rep-name').value)||'';
+    var dept =($('rep-dept') && $('rep-dept').value)||'';
+    var pri  =($('rep-pri')  && $('rep-pri').value)||'Mellem';
+    var typ  =($('rep-type') && $('rep-type').value)||'';
+    var wh   =($('rep-where')&& $('rep-where').value)||'';
+    var desc =($('rep-desc') && $('rep-desc').value)||'';
+
+    var ok=true;
+    if(!name.replace(/\s+/g,'')){
+      setError('rep-name','err-name','Udfyld Navn.');
+      ok=false;
+    }
+    if(!dept){
+      setError('rep-dept','err-dept','Vælg Afdeling.');
+      ok=false;
+    }
+    if(!wh.replace(/\s+/g,'')){
+      setError('rep-where','err-where','Udfyld Hvor.');
+      ok=false;
+    }
+    if(!desc.replace(/\s+/g,'')){
+      setError('rep-desc','err-desc','Udfyld Beskrivelse.');
+      ok=false;
+    }
+    if(!ok){
+      var h=$('sendHint');
+      if(h){
+        h.innerHTML='Ret venligst de markerede felter.';
+        h.style.color='#b91c1c';
+      }
+      return;
+    }
+
+    var nowIso=new Date().toISOString();
+    var id=uuid();
+
+    var r={
+      id:         id,
+      ts:         nowIso,
+      name:       name,
+      department: dept,
+      priority:   pri,
+      type:       typ,
+      where:      wh,
+      description:desc,
+      status:     'Åben'
+    };
+
+    var arr=reps();
+    arr.push(r);
+    saveReps(arr);
+
+    // gem navn/afdeling til næste gang
+    var s=settings();
+    s.name=name;
+    s.department=dept;
+    saveSettings(s);
+
+    // Læg i kø til Power Automate → SharePoint
+    queueUpdate('rep',{
+      id:          id,
+      ts:          nowIso,
+      name:        name,
+      department:  dept,
+      priority:    pri,
+      type:        typ,
+      where:       wh,
+      description: desc,
+      status:      'Åben'
+    },DELAY_REP_MS);
+
+    // ryd "sags"-felter men bevar navn/afdeling
+    if($('rep-pri'))   {$('rep-pri').value='Mellem';}
+    if($('rep-type'))  {$('rep-type').value='';}
+    if($('rep-where')) {$('rep-where').value='';}
+    if($('rep-desc'))  {$('rep-desc').value='';}
+    clearDraft();
+    saveDraft(); // gem ny draft m. navn/afdeling
+
+    var h=$('sendHint');
+    if(h){
+      h.innerHTML='Rep-seddel oprettet. Sendes til SharePoint om ca. 3 minutter. Du kan redigere eller afslutte i listen nedenfor inden da.';
+      h.style.color='#16a34a';
+    }
+
+    renderRepList();
+  }
+
+  function clearRepForm(){
+    clearErrors();
+    if($('rep-name'))  {$('rep-name').value='';}
+    if($('rep-dept'))  {$('rep-dept').value='';}
+    if($('rep-pri'))   {$('rep-pri').value='Mellem';}
+    if($('rep-type'))  {$('rep-type').value='';}
+    if($('rep-where')) {$('rep-where').value='';}
+    if($('rep-desc'))  {$('rep-desc').value='';}
+    clearDraft();
+    var h=$('sendHint');
+    if(h){
+      h.innerHTML='Rep-sedler sendes til SharePoint via Power Automate ca. 3 minutter efter oprettelse. Du kan redigere i denne periode – den seneste version bliver sendt.';
+      h.style.color='#6b7280';
+    }
+  }
+
+  function clearRepList(){
+    saveReps([]);
+    renderRepList();
+  }
+
+  // ===== Bind =====
+  function bind(){
+    // autosave på alle felter
+    var ids=['rep-name','rep-dept','rep-pri','rep-type','rep-where','rep-desc'];
+    var i;
+    for(i=0;i<ids.length;i++){
+      (function(id){
+        var el=$(id);
+        if(!el){return;}
+        el.oninput=saveDraft;
+        el.onchange=saveDraft;
+      })(ids[i]);
+    }
+
+    if($('rep-clear'))  {$('rep-clear').onclick=clearRepForm;}
+    if($('rep-create')) {$('rep-create').onclick=createRep;}
+
+    var box=$('list-confirm');
+    if($('btn-clear-list')){
+      $('btn-clear-list').onclick=function(){
+        if(box){
+          if(box.style.display==='none' || box.style.display===''){
+            box.style.display='block';
+          }else{
+            box.style.display='none';
+          }
+        }
+      };
+    }
+    if($('btn-list-cancel')){
+      $('btn-list-cancel').onclick=function(){
+        if(box){box.style.display='none';}
+      };
+    }
+    if($('btn-list-do')){
+      $('btn-list-do').onclick=function(){
+        clearRepList();
+        if(box){box.style.display='none';}
+      };
+    }
+
+    if($('btn-test')){
+      $('btn-test').onclick=function(){
+        var env={
+          kind:'test',
+          client_ts:new Date().toISOString(),
+          basis:basisBlock(),
+          data:{hello:'world',rand:Math.floor(Math.random()*100000)}
+        };
+        postJSON(ENDPOINT_UNIFIED,env,function(ok,code,_){
+          var h=$('sendHint');
+          if(!h){return;}
+          if(ok){
+            h.innerHTML='Test-kald sendt korrekt (HTTP '+code+').';
+            h.style.color='#16a34a';
+          }else{
+            h.innerHTML='Fejl ved test-kald (HTTP '+code+').';
+            h.style.color='#b91c1c';
+          }
+        });
+      };
+    }
+  }
+
+  window.addEventListener('DOMContentLoaded',function(){
+    restoreDraft();
+    renderRepList();
+    updateStatusLamp();
+    bind();
+
+    resendQueued();
+    // forsøg at sende igen hvert 30. sekund (håndterer offline/online + Edge luk/åben)
+    setInterval(resendQueued,30*1000);
+  });
+  </script>
+</body>
+</html>
